@@ -96,24 +96,26 @@ func healWound() {
     } while (true)
 }
 
-func forestOfTroll() {
+func encounter(intro: String, enemy: String) {
     var quant = Int.random(in: 1...5)
-    var dmg = 5
-    var scanned = false
-    var ene_hp = 1000
+    var dmgs = (1...quant).map( {_ in Int.random(in: 1...10)} )
+    var scanned = Array(repeating: false, count: quant)
+    var ene_hps = (1...quant).map( {_ in Int.random(in: 500...800)} )
     var block = false
     var input: String?
-    print("""
-
-As you enter the forest, you feel a sense of unease wash over you.
-Suddenly, you hear the sound of twigs snapping behind you. You quickly spin around, and find a Troll emerging from the shadows.
-""")
+    
+    print(intro)
     
     repeat {
+        
+        var ene_slain = ene_hps.filter{$0 == 0}.count
+        
         print("""
 
-    😈 Name: Troll x\(quant)
-    😈 Health: \(scanned ? String(ene_hp) : "??")
+    😈 Name: \(enemy) x\(quant - ene_slain)
+    😈 Health: \(scanned[ene_slain] ? String(ene_hps[ene_slain]) : "??")
+    
+    😩 Player's Health: \(hp)/100
 
     Choose your action:
     [1] Physical Attack. No mana required. Deal 5pt of damage.
@@ -121,116 +123,84 @@ Suddenly, you hear the sound of twigs snapping behind you. You quickly spin arou
     [3] Shield. Use 10pt of MP. Block enemy's attack in 1 turn.
 
     [4] Use Potion to heal wound.
-    [5] Scan enemy's vital
-    [6] Flee from battle.
+    [5] Use Elixir to fill mana.
+    [6] Scan enemy's vital
+    [7] Flee from battle.
 
     Your choice?
     """, terminator: " ")
         input = readLine()
         
-        if (input == "6") {
+        if (input == "7") {
             break
         }
+        else if (input == "6") {
+            scanned[ene_slain] = true
+            print("\nYou scan the enemy's vital!")
+        }
         else if (input == "5") {
-            scanned = true
+            if (elixir == 0) {
+                print("\nYou don't have any elixir!")
+            } else {
+                elixir -= 1
+                mp += (mp <= 40) ? 10 : (50 - mp)
+                print("\nYou're filled with mana!")
+            }
         }
         else if (input == "4") {
             if (potion == 0) {
                 print("\nYou don't have any potion!")
             } else {
                 potion -= 1
-                hp += (hp <= 80) ? 20 : 100 - hp
+                hp += (hp <= 80) ? 20 : (100 - hp)
+                print("\nYou heal!")
             }
         }
         else if (input == "3") {
             if (mp >= 10) {
                 mp -= 10
                 block.toggle()
+                print("\nYou block!")
+            }
+            else {
+                print("\nYou don't have mana!")
             }
         }
         else if (input == "2") {
             if (mp >= 15) {
                 mp -= 15
-                ene_hp -= 50
+                ene_hps[ene_slain] -= (ene_hps[ene_slain] >= 50) ? 50 : ene_hps[ene_slain]
+                print("\nYou use Meteor!")
+            }
+            else {
+                print("\nYou don't have mana")
             }
         }
         else if (input == "1") {
-            ene_hp -= 5
+            ene_hps[ene_slain] -= (ene_hps[ene_slain] >= 5) ? 5 : ene_hps[ene_slain]
+            print("\nYou attack!")
         }
         
+        if (ene_hps[ene_slain] == 0 && ene_slain == quant) {
+            print("\nYou slay the trolls!")
+            break
+        }
+        
+        if (!block) {
+            hp -= dmgs[ene_slain]
+        } else {
+            block.toggle()
+        }
+        
+        if (hp <= 0) {
+            break
+        }
         
     } while (true)
     if (input == "6") {
         flee()
     }
-}
-
-func mountainOfGolem() {
-    var quant = Int.random(in: 1...5)
-    var dmg = 5
-    var scanned = false
-    var ene_hp = 1000
-    var block = false
-    var input: String?
-    print("""
-
-As you make your way through the rugged mountain terrain, you can feel the chill of the wind biting at your skin.
-Suddenly, you hear a sound that makes you freeze in your tracks. That's when you see it - a massive, snarling Golem emerging from the shadows.
-""")
     
-    repeat {
-        print("""
-
-    😈 Name: Golem x1
-    😈 Health: \(scanned ? String(ene_hp) : "??")
-
-    Choose your action:
-    [1] Physical Attack. No mana required. Deal 5pt of damage.
-    [2] Meteor. Use 15pt of MP. Deal 50pt of damage.
-    [3] Shield. Use 10pt of MP. Block enemy's attack in 1 turn.
-
-    [4] Use Potion to heal wound.
-    [5] Scan enemy's vital
-    [6] Flee from battle.
-
-    Your choice?
-    """, terminator: " ")
-        input = readLine()
-        
-        if (input == "6") {
-            break
-        }
-        else if (input == "5") {
-            scanned = true
-        }
-        else if (input == "4") {
-            if (potion == 0) {
-                print("\nYou don't have any potion!")
-            } else {
-                potion -= 1
-                hp += (hp <= 80) ? 20 : 100 - hp
-            }
-        }
-        else if (input == "3") {
-            if (mp >= 10) {
-                mp -= 10
-                block.toggle()
-            }
-        }
-        else if (input == "2") {
-            if (mp >= 15) {
-                mp -= 15
-                ene_hp -= 50
-            }
-        }
-        else if (input == "1") {
-            ene_hp -= 5
-        }
-        
-    } while (true)
-    if (input == "6") {
-        flee()
-    }
 }
 
 func flee() {
@@ -248,57 +218,75 @@ func flee() {
     } while (input != "")
 }
 
-repeat {
-    print("""
-    
-    Welcome to the world of magic! 🧙🏿‍♂️🪄
+func main() {
+    repeat {
+        print("""
+        
+        Welcome to the world of magic! 🧙🏿‍♂️🪄
 
-    You have been chosen to embark on an epic journey as a young wizard on the path to becoming a master of the arcane arts. Your adventure will take you through forests 🌲, mountains ⛰️, and dungeons 🏰, where you will face challenges, make allies, and fight enemies.
+        You have been chosen to embark on an epic journey as a young wizard on the path to becoming a master of the arcane arts. Your adventure will take you through forests 🌲, mountains ⛰️, and dungeons 🏰, where you will face challenges, make allies, and fight enemies.
 
-    Press [return] to continue:
-    """, terminator: " ")
-    start = readLine()
-} while (start != "")
+        Press [return] to continue:
+        """, terminator: " ")
+        start = readLine()
+    } while (start != "")
 
-repeat {
-    print("\nMay I know your name, a young wizard?", terminator: " ")
-    name = readLine()
-} while (
-    !containsOnlyLetters(input: name ?? "1") || name == ""
-)
-print("\nNice to meet you \(name!)")
+    repeat {
+        print("\nMay I know your name, a young wizard?", terminator: " ")
+        name = readLine()
+    } while (
+        !containsOnlyLetters(input: name ?? "1") || name == ""
+    )
+    print("\nNice to meet you \(name!)")
 
-repeat {
-    print("""
+    repeat {
+        
+        if (hp <= 0) {
+            print("\nYou Died!")
+            break
+        }
+        
+        print("""
 
-    From here, you can...
+        From here, you can...
 
-    [C]heck your health and stats
-    [H]eal your wounds with potion
+        [C]heck your health and stats
+        [H]eal your wounds with potion
 
-    ...or choose where you want to go
+        ...or choose where you want to go
 
-    [F]orest of Troll
-    [M]ountain of Golem
-    [Q]uit game
+        [F]orest of Troll
+        [M]ountain of Golem
+        [Q]uit game
 
-    Your choice?
-    """, terminator: " ")
-    go = readLine()
-    let lowGo = go?.lowercased()
-    if (lowGo == "c") {
-        playerStats()
-    }
-    else if (lowGo == "h") {
-        healWound()
-    }
-    else if (lowGo == "f") {
-        forestOfTroll()
-    }
-    else if (lowGo == "m") {
-        mountainOfGolem()
-    }
-    else if (lowGo == "q") {
-        break
-    }
-} while (true)
+        Your choice?
+        """, terminator: " ")
+        go = readLine()
+        let lowGo = go?.lowercased()
+        if (lowGo == "c") {
+            playerStats()
+        }
+        else if (lowGo == "h") {
+            healWound()
+        }
+        else if (lowGo == "f") {
+            encounter(intro: """
+            
+            As you make your way through the rugged mountain terrain, you can feel the chill of the wind biting at your skin.
+            Suddenly, you hear a sound that makes you freeze in your tracks. That's when you see it - a massive, snarling Golem emerging from the shadows.
+            """, enemy: "Troll")
+        }
+        else if (lowGo == "m") {
+            encounter(intro: """
+
+            As you make your way through the rugged mountain terrain, you can feel the chill of the wind biting at your skin.
+            Suddenly, you hear a sound that makes you freeze in your tracks. That's when you see it - a massive, snarling Golem emerging from the shadows.
+            """, enemy: "Golem")
+        }
+        else if (lowGo == "q") {
+            break
+        }
+    } while (true)
+}
+
+main()
