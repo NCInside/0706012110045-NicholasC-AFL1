@@ -10,7 +10,7 @@ import Foundation
 var start : String?
 var name : String?
 var go : String?
-var hp = 100
+var usr_hp = 100
 var mp = 50
 var potion = 10
 var elixir = 5
@@ -31,7 +31,7 @@ func playerStats() {
     
     Player name: \(name!)
 
-    HP: \(hp)/100
+    HP: \(usr_hp)/100
     MP: \(mp)/50
 
     Magic:
@@ -69,7 +69,7 @@ func healWound() {
             first.toggle()
             print("""
 
-        Your HP is \(hp).
+        Your HP is \(usr_hp).
         You have \(potion) Potions.
 
         Are you sure want to use 1 potion to heal wound? [Y/N]
@@ -78,7 +78,7 @@ func healWound() {
         } else {
             print("""
 
-        Your HP is now: \(hp)
+        Your HP is now: \(usr_hp)
         You have \(potion) Potion left.
 
         Still want to use 1 potion to heal wound again? [Y/N]
@@ -91,14 +91,14 @@ func healWound() {
         }
         else if (input?.lowercased() == "y"){
             potion -= 1
-            hp += (hp <= 80) ? 20 : 100 - hp
+            usr_hp += (usr_hp <= 80) ? 20 : 100 - usr_hp
         }
     } while (true)
 }
 
 func encounter(intro: String, enemy: String) {
-    var quant = Int.random(in: 1...5)
-    var dmgs = (1...quant).map( {_ in Int.random(in: 1...10)} )
+    let quant = Int.random(in: 1...5)
+    let ene_dmgs = (1...quant).map( {_ in Int.random(in: 1...10)} )
     var scanned = Array(repeating: false, count: quant)
     var ene_hps = (1...quant).map( {_ in Int.random(in: 500...800)} )
     var block = false
@@ -108,17 +108,17 @@ func encounter(intro: String, enemy: String) {
     
     repeat {
         
-        var ene_slain = ene_hps.filter{$0 == 0}.count
+        let ene_slain = ene_hps.filter{$0 == 0}.count
         
         print("""
 
     😈 Name: \(enemy) x\(quant - ene_slain)
     😈 Health: \(scanned[ene_slain] ? String(ene_hps[ene_slain]) : "??")
     
-    😩 Player's Health: \(hp)/100
+    😩 Player's Health: \(usr_hp)/100
 
     Choose your action:
-    [1] Physical Attack. No mana required. Deal 5pt of damage.
+    [1] Physical Attack. No mana required. Deal 10-25pt of damage.
     [2] Meteor. Use 15pt of MP. Deal 50pt of damage.
     [3] Shield. Use 10pt of MP. Block enemy's attack in 1 turn.
 
@@ -152,7 +152,7 @@ func encounter(intro: String, enemy: String) {
                 print("\nYou don't have any potion!")
             } else {
                 potion -= 1
-                hp += (hp <= 80) ? 20 : (100 - hp)
+                usr_hp += (usr_hp <= 80) ? 20 : (100 - usr_hp)
                 print("\nYou heal!")
             }
         }
@@ -177,22 +177,23 @@ func encounter(intro: String, enemy: String) {
             }
         }
         else if (input == "1") {
-            ene_hps[ene_slain] -= (ene_hps[ene_slain] >= 5) ? 5 : ene_hps[ene_slain]
+            let usr_dmg = Int.random(in: 10...25)
+            ene_hps[ene_slain] -= (ene_hps[ene_slain] >= usr_dmg) ? usr_dmg : ene_hps[ene_slain]
             print("\nYou attack!")
         }
         
         if (ene_hps[ene_slain] == 0 && ene_slain == quant) {
-            print("\nYou slay the trolls!")
+            print("\nYou slay the \(enemy)!")
             break
         }
         
         if (!block) {
-            hp -= dmgs[ene_slain]
+            usr_hp -= ene_dmgs[ene_slain]
         } else {
             block.toggle()
         }
         
-        if (hp <= 0) {
+        if (usr_hp <= 0) {
             break
         }
         
@@ -241,7 +242,7 @@ func main() {
 
     repeat {
         
-        if (hp <= 0) {
+        if (usr_hp <= 0) {
             print("\nYou Died!")
             break
         }
