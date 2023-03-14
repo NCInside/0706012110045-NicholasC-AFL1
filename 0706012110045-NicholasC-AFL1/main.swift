@@ -91,7 +91,7 @@ func healWound() {
         }
         else if (input?.lowercased() == "y"){
             potion -= 1
-            usr_hp += (usr_hp <= 80) ? 20 : 100 - usr_hp
+            usr_hp += (usr_hp <= 80) ? 20 : (100 - usr_hp)
         }
     } while (true)
 }
