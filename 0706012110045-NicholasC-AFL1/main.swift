@@ -109,7 +109,7 @@ func main() {
         MP: \(userStatistics["mp"]!)/50
 
         Magic:
-        - Physical Attack. No mana required. Deal 5pt of damage.
+        - Physical Attack. No mana required. Deal 10-25pt of damage.
         - Meteor. Use 15pt of MP. Deal 50pt of damage.
         - Shield. Use 10pt of MP. Block enemy's attack in 1 turn.
 
