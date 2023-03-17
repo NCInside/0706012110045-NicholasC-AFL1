@@ -103,7 +103,7 @@ func main() {
         repeat {
             print("""
         
-        Player name: \(String(describing: userName))
+        Player name: \(userName!)
 
         HP: \(userStatistics["hp"]!)/100
         MP: \(userStatistics["mp"]!)/50
