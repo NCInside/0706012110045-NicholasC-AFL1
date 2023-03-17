@@ -97,7 +97,7 @@ func main() {
        return true
     }
 
-    // Check stats screen
+    // Check stats screen, takes no input to only show user's statistics
     func playerStats() {
         var input: String?
         repeat {
@@ -123,7 +123,7 @@ func main() {
         } while (input != "")
     }
 
-    // Heal wound screen
+    // Heal wound screen, take non-case sensitive y/n input to perform drink potion
     func healWound() {
         var first = true
         repeat {
@@ -171,7 +171,7 @@ func main() {
         } while (true)
     }
 
-    // Enemy encounter screen
+    // Enemy encounter screen, takes a series of non-case input to perform logics
     func encounter(intro: String, enemy: String) {
         let enemyQuantity = Int.random(in: 1...5)
         let enemyDamages = (1...enemyQuantity).map( {_ in Int.random(in: 3...5)} )
@@ -288,7 +288,7 @@ func main() {
         
     }
 
-    // Flee screen
+    // Flee screen, repeating print
     func flee() {
         var input: String?
         repeat {
