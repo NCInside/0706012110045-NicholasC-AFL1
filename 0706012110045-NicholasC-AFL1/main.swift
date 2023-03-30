@@ -22,23 +22,22 @@ func main() {
         """, terminator: " ")
         input = readLine()
     } while (input != "")
-
+    
     input = nil
-    var userName: String?
+    var name: String?
     
     repeat {
         print("\nMay I know your name, a young wizard?", terminator: " ")
-        userName = readLine()
+        name = readLine()
     } while (
-        !containsOnlyLetters(input: userName ?? "1") || userName == ""
+        !containsOnlyLetters(input: name ?? "1") || name == ""
     )
-    
-    var userStatistics = ["hp": 100, "mp": 50, "potion": 15, "elixir": 12]
-    print("\nNice to meet you \(userName!)")
+    let user = User(name: name!, potion: 15, elixir: 12)
+    print("\nNice to meet you \(user.name)")
 
     outerLoop: repeat {
         
-        if (userStatistics["hp"]! <= 0) {
+        if (user.hp <= 0) {
             print("\nYou Died!")
             break
         }
@@ -71,13 +70,13 @@ func main() {
             
             As you make your way through the rugged mountain terrain, you can feel the chill of the wind biting at your skin.
             Suddenly, you hear a sound that makes you freeze in your tracks. That's when you see it - a massive, snarling Golem emerging from the shadows.
-            """, enemy: "Troll")
+            """, enemyName: "Troll")
         case "m":
             encounter(intro: """
 
             As you make your way through the rugged mountain terrain, you can feel the chill of the wind biting at your skin.
             Suddenly, you hear a sound that makes you freeze in your tracks. That's when you see it - a massive, snarling Golem emerging from the shadows.
-            """, enemy: "Golem")
+            """, enemyName: "Golem")
         case "q":
             break outerLoop
         default:
@@ -87,7 +86,6 @@ func main() {
     } while (true)
     
     
-    // Function to check if a string contains only alphabet and not nil
     func containsOnlyLetters(input: String) -> Bool {
        for chr in input {
           if (!(chr >= "a" && chr <= "z") && !(chr >= "A" && chr <= "Z") ) {
@@ -97,25 +95,24 @@ func main() {
        return true
     }
 
-    // Check stats screen, takes no input to only show user's statistics
     func playerStats() {
         var input: String?
         repeat {
             print("""
         
-        Player name: \(userName!)
+        Player name: \(user.name)
 
-        HP: \(userStatistics["hp"]!)/100
-        MP: \(userStatistics["mp"]!)/50
+        HP: \(user.hp)/\(user.maxHp)
+        MP: \(user.mp)/\(user.maxMp)
 
         Magic:
-        - Physical Attack. No mana required. Deal 10-25pt of damage.
+        - Physical Attack. No mana required. Deal a 10-25pt of damage.
         - Meteor. Use 15pt of MP. Deal 50pt of damage.
         - Shield. Use 10pt of MP. Block enemy's attack in 1 turn.
 
         Items:
-        - Potion x\(userStatistics["potion"]!). Heal 20pt of your HP.
-        - Elixir x\(userStatistics["elixir"]!). Add 10pt of your MP.
+        - Potion x\(user.potion). Heal \(user.potionHeal)pt of your HP.
+        - Elixir x\(user.elixir). Add \(user.elixirHeal)pt of your MP.
 
         Press [return] to go back:
         """, terminator: " ")
@@ -123,12 +120,11 @@ func main() {
         } while (input != "")
     }
 
-    // Heal wound screen, take non-case sensitive y/n input to perform drink potion
     func healWound() {
         var first = true
         repeat {
             var input: String?
-            if (userStatistics["potion"] == 0) {
+            if (user.potion == 0) {
                 repeat {
                     print("""
 
@@ -144,8 +140,8 @@ func main() {
                 first.toggle()
                 print("""
 
-            Your HP is \(userStatistics["hp"]!).
-            You have \(userStatistics["potion"]!) Potions.
+            Your HP is \(user.hp).
+            You have \(user.potion) Potions.
 
             Are you sure want to use 1 potion to heal wound? [Y/N]
             """, terminator: " ")
@@ -153,8 +149,8 @@ func main() {
             } else {
                 print("""
 
-            Your HP is now: \(userStatistics["hp"]!)
-            You have \(userStatistics["potion"]!) Potion left.
+            Your HP is now: \(user.hp)
+            You have \(user.potion) Potion left.
 
             Still want to use 1 potion to heal wound again? [Y/N]
             """, terminator: " ")
@@ -165,38 +161,37 @@ func main() {
                 break
             }
             else if (input?.lowercased() == "y"){
-                userStatistics["potion"]! -= 1
-                userStatistics["hp"]! += (userStatistics["hp"]! <= 80) ? 20 : (100 - userStatistics["hp"]!)
+                user.usePotion()
             }
         } while (true)
     }
 
-    // Enemy encounter screen, takes a series of non-case input to perform logics
-    func encounter(intro: String, enemy: String) {
+    func encounter(intro: String, enemyName: String) {
         let enemyQuantity = Int.random(in: 1...5)
-        let enemyDamages = (1...enemyQuantity).map( {_ in Int.random(in: 3...5)} )
-        var enemyHps = (1...enemyQuantity).map( {_ in Int.random(in: 300...500)} )
-        var isScanned = Array(repeating: false, count: enemyQuantity)
-        
-        var block = false
         var input: String?
+        var enemies: [Enemy] = []
+        
+        for _ in 1...enemyQuantity {
+            enemies.append(Enemy(name: enemyName, damage: Int.random(in: 3...5), hp: Int.random(in: 300...500)))
+        }
         
         print(intro)
         
         repeat {
             
-            let enemySlain = enemyHps.filter{$0 == 0}.count
+            let enemySlain = enemies.filter { $0.hp <= 0 }.count
+            let enemy = enemies[enemySlain]
             
             print("""
 
-        😈 Enemy's Name: \(enemy) x\(enemyQuantity - enemySlain)
-        😈 Enemy's Health: \(isScanned[enemySlain] ? String(enemyHps[enemySlain]) : "??")
-        😈 Enemy's Damage: \(String(enemyDamages[enemySlain]))
+        😈 Enemy's Name: \(enemy.name) x\(enemyQuantity - enemySlain)
+        😈 Enemy's Health: \(enemy.scanned ? String(enemy.hp) : "??")
+        😈 Enemy's Damage: \(enemy.damage)
         
-        😩 Player's Health: \(userStatistics["hp"]!)/100
-        😩 Player's Mana: \(userStatistics["mp"]!)/50
-        😩 Player's Potion: \(userStatistics["potion"]!)
-        😩 Player's Elixir: \(userStatistics["elixir"]!)
+        😩 Player's Health: \(user.hp)/\(user.maxHp)
+        😩 Player's Mana: \(user.mp)/\(user.maxMp)
+        😩 Player's Potion: \(user.potion)
+        😩 Player's Elixir: \(user.elixir)
 
         Choose your action:
         [1] Physical Attack. No mana required. Deal 10-25pt of damage.
@@ -217,31 +212,27 @@ func main() {
                 break
             }
             else if (input == "6") {
-                isScanned[enemySlain] = true
+                enemy.scanned = true
                 print("\nYou scan the enemy's vital!")
             }
             else if (input == "5") {
-                if (userStatistics["elixir"] == 0) {
+                if (user.elixir == 0) {
                     print("\nYou don't have any elixir!")
                 } else {
-                    userStatistics["elixir"]! -= 1
-                    userStatistics["mp"]! += (userStatistics["mp"]! <= 40) ? 10 : (50 - userStatistics["mp"]!)
+                    user.useElixir()
                     print("\nYou're filled with mana!")
                 }
             }
             else if (input == "4") {
-                if (userStatistics["potion"] == 0) {
+                if (user.potion == 0) {
                     print("\nYou don't have any potion!")
                 } else {
-                    userStatistics["potion"]! -= 1
-                    userStatistics["hp"]! += (userStatistics["hp"]! <= 80) ? 20 : (100 - userStatistics["hp"]!)
+                    user.usePotion()
                     print("\nYou heal!")
                 }
             }
             else if (input == "3") {
-                if (userStatistics["mp"]! >= 10) {
-                    userStatistics["mp"]! -= 10
-                    block.toggle()
+                if (user.shield(manaCost: 10)) {
                     print("\nYou use shield!")
                 }
                 else {
@@ -249,9 +240,7 @@ func main() {
                 }
             }
             else if (input == "2") {
-                if (userStatistics["mp"]! >= 15) {
-                    userStatistics["mp"]! -= 15
-                    enemyHps[enemySlain] -= 50
+                if (user.meteor(enemy: enemy, damage: 50, manaCost: 15)) {
                     print("\nYou use Meteor!")
                 }
                 else {
@@ -259,28 +248,26 @@ func main() {
                 }
             }
             else if (input == "1") {
-                let userDamage = Int.random(in: 10...25)
-                enemyHps[enemySlain] -= userDamage
-                print("\nYou attack!, you deal \(userDamage)pt of damage!")
+                let damage = user.attack(enemy: enemy, minDamage: 10, maxDamage: 25)
+                print("\nYou attack, you deal \(damage)pt of damage!")
             }
             else {
                 print("\nYou fumbled!")
             }
             
-            if (enemyHps[enemySlain] <= 0 && enemySlain == enemyQuantity - 1) {
-                print("\nYou slay the \(enemy)!")
+            if (enemy.hp <= 0 && enemySlain == enemyQuantity - 1) {
+                print("\nYou slay the \(enemy.name)!")
                 break
             }
             
-            if (!block) {
-                userStatistics["hp"]! -= enemyDamages[enemySlain]
-                print("\nThe enemy attacks you for \(enemyDamages[enemySlain])pt of damage!")
+            if (enemy.attack(user: user)) {
+                print("\nThe enemy attacks you for \(enemy.damage)pt of damage!")
             } else {
-                block.toggle()
+                user.block.toggle()
                 print("\nYou block!")
             }
             
-            if (userStatistics["hp"]! <= 0) {
+            if (user.hp <= 0) {
                 break
             }
             
@@ -288,7 +275,6 @@ func main() {
         
     }
 
-    // Flee screen, repeating print
     func flee() {
         var input: String?
         repeat {
