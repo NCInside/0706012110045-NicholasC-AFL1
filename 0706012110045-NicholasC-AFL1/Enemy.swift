@@ -7,21 +7,16 @@
 
 import Foundation
 
-class Enemy {
+class Enemy: Entity {
     
-    let name: String
-    let damage: Int
-    var hp: Int
     var scanned: Bool
     
     init(name: String, damage: Int, hp: Int, scanned: Bool = false) {
-        self.name = name
-        self.damage = damage
-        self.hp = hp
         self.scanned = scanned
+        super.init(name: name, damage: damage, hp: hp)
     }
     
-    func attack(user: User) -> Bool {
+    func attackUser(user: User) -> Bool {
         if user.block {
             return false
         }

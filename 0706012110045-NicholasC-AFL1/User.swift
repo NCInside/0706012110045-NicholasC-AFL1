@@ -7,12 +7,9 @@
 
 import Foundation
 
-class User {
-    
-    let name: String
+class User: Entity {
     
     let maxHp: Int
-    var hp: Int
     
     let maxMp: Int
     var mp: Int
@@ -25,10 +22,8 @@ class User {
     
     var block: Bool
     
-    init(name: String, maxHp: Int = 100, maxMp: Int = 50, potion: Int, potionHeal: Int = 20, elixir: Int, elixirHeal: Int = 10, block: Bool = false) {
-        self.name = name
+    init(name: String, damage: Int, maxHp: Int = 100, maxMp: Int = 50, potion: Int, potionHeal: Int = 20, elixir: Int, elixirHeal: Int = 10, block: Bool = false) {
         self.maxHp = maxHp
-        self.hp = maxHp
         self.maxMp = maxMp
         self.mp = maxMp
         self.potion = potion
@@ -36,6 +31,7 @@ class User {
         self.elixir = elixir
         self.elixirHeal = elixirHeal
         self.block = block
+        super.init(name: name, damage: damage, hp: maxHp)
     }
     
     func usePotion() {
@@ -60,12 +56,6 @@ class User {
         enemy.scanned = true
     }
     
-    func attack(enemy: Enemy, minDamage: Int, maxDamage: Int) -> Int {
-        let damage = Int.random(in: minDamage...maxDamage)
-        enemy.hp -= damage
-        return damage
-    }
-    
     func meteor(enemy: Enemy, damage: Int, manaCost: Int) -> Bool {
         if mp < manaCost {
             return false
@@ -73,6 +63,12 @@ class User {
         mp -= manaCost
         enemy.hp -= damage
         return true
+    }
+    
+    func physicalAttack(enemy: Enemy) -> Int {
+        let damage = damage < 6 ? damage : Int.random(in: (damage-5)...(damage+5))
+        enemy.hp -= damage
+        return damage
     }
     
 }

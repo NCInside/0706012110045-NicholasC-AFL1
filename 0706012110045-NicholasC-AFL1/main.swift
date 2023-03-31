@@ -32,7 +32,7 @@ func main() {
     } while (
         !containsOnlyLetters(input: name ?? "1") || name == ""
     )
-    let user = User(name: name!, potion: 15, elixir: 12)
+    let user = User(name: name!, damage: 15, potion: 15, elixir: 12)
     print("\nNice to meet you \(user.name)")
 
     outerLoop: repeat {
@@ -106,7 +106,7 @@ func main() {
         MP: \(user.mp)/\(user.maxMp)
 
         Magic:
-        - Physical Attack. No mana required. Deal a 10-25pt of damage.
+        - Physical Attack. No mana required. Deal \(user.damage < 6 ? String(user.damage) : "\(user.damage-5)-\(user.damage+5)")pt of damage.
         - Meteor. Use 15pt of MP. Deal 50pt of damage.
         - Shield. Use 10pt of MP. Block enemy's attack in 1 turn.
 
@@ -194,7 +194,7 @@ func main() {
         😩 Player's Elixir: \(user.elixir)
 
         Choose your action:
-        [1] Physical Attack. No mana required. Deal 10-25pt of damage.
+        [1] Physical Attack. No mana required. Deal \(user.damage < 6 ? String(user.damage) : "\(user.damage-5)-\(user.damage+5)")pt of damage.
         [2] Meteor. Use 15pt of MP. Deal 50pt of damage.
         [3] Shield. Use 10pt of MP. Block enemy's attack in 1 turn.
 
@@ -248,7 +248,7 @@ func main() {
                 }
             }
             else if (input == "1") {
-                let damage = user.attack(enemy: enemy, minDamage: 10, maxDamage: 25)
+                let damage = user.physicalAttack(enemy: enemy)
                 print("\nYou attack, you deal \(damage)pt of damage!")
             }
             else {
@@ -260,7 +260,7 @@ func main() {
                 break
             }
             
-            if (enemy.attack(user: user)) {
+            if (enemy.attackUser(user: user)) {
                 print("\nThe enemy attacks you for \(enemy.damage)pt of damage!")
             } else {
                 user.block.toggle()
