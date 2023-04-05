@@ -7,7 +7,7 @@
 
 import Foundation
 
-class Enemy: Entity {
+class Enemy: Character {
     
     var scanned: Bool
     

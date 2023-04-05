@@ -7,8 +7,7 @@
 
 import Foundation
 
-class User: Entity {
-    
+class User: Character {
     let maxHp: Int
     
     let maxMp: Int

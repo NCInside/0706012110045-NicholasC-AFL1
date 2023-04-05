@@ -1,13 +1,13 @@
 //
-//  Entity.swift
+//  Character.swift
 //  0706012110045-NicholasC-AFL1
 //
-//  Created by MacBook Pro on 31/03/23.
+//  Created by MacBook Pro on 04/04/23.
 //
 
 import Foundation
 
-class Entity {
+class Character {
     
     let name: String
     let damage: Int
