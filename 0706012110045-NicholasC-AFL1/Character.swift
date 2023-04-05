@@ -10,7 +10,7 @@ import Foundation
 class Character {
     
     let name: String
-    let damage: Int
+    var damage: Int
     var hp: Int
     
     init(name: String, damage: Int, hp: Int) {

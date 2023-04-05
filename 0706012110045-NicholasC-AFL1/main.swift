@@ -48,6 +48,7 @@ func main() {
 
         [C]heck your health and stats
         [H]eal your wounds with potion
+        [E]quip or craft items
 
         ...or choose where you want to go
 
@@ -248,7 +249,7 @@ func main() {
                 }
             }
             else if (input == "1") {
-                let damage = user.physicalAttack(enemy: enemy)
+                let damage = user.attack(enemy)
                 print("\nYou attack, you deal \(damage)pt of damage!")
             }
             else {
@@ -260,8 +261,9 @@ func main() {
                 break
             }
             
-            if (enemy.attackUser(user: user)) {
-                print("\nThe enemy attacks you for \(enemy.damage)pt of damage!")
+            let enemyDamage = enemy.attack(user)
+            if (!user.block) {
+                print("\nThe enemy attacks you for \(enemyDamage)pt of damage!")
             } else {
                 user.block.toggle()
                 print("\nYou block!")

@@ -7,21 +7,26 @@
 
 import Foundation
 
-class Enemy: Character {
+class Enemy: Character, Attack {
+    typealias AttackTarget = User
     
     var scanned: Bool
+    var drops: [Material]
     
-    init(name: String, damage: Int, hp: Int, scanned: Bool = false) {
-        self.scanned = scanned
+    init(name: String, damage: Int, hp: Int, drops: Material...) {
+        self.scanned = false
+        self.drops = drops
         super.init(name: name, damage: damage, hp: hp)
     }
     
-    func attackUser(user: User) -> Bool {
-        if user.block {
-            return false
-        }
-        user.hp -= damage
-        return true
+    func attack(_ target: User) -> Int {
+        let damage = target.block ? 0 : self.damage
+        target.hp -= damage
+        return damage
+    }
+    
+    func dropLoot() -> Material {
+        return drops.randomElement()!
     }
     
 }
