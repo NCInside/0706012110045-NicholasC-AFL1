@@ -10,25 +10,36 @@ import Foundation
 class Main {
     
     var input: String?
-    let materialsName = ["Rock Heart", "Harden Soul", "Double Chambered Heart", "Oversized Tendon"]
-    let items = [
-        Item(name: "Excalibur", recipe: [
-            Material(name: "Rock Heart", rating: 8),
-            Material(name: "Harden Soul", rating: 6),
-            Material(name: "Oversized Tendon", rating: 4)
-        ], damageBoost: 20, specialPrompt: "You split the sky alongside the world!", specialDamage: 85, specialCost: 20),
-        Item(name: "Gáe Bolg", recipe: [
-            Material(name: "Double Chambered Heart", rating: 8),
-            Material(name: "Oversized Tendon", rating: 6),
-            Material(name: "Rock Heart", rating: 4)
-        ], damageBoost: 30, specialPrompt: "You have pierced to the core of the world!", specialDamage: 75, specialCost: 30),
-        Item(name: "Ea", recipe: [
-            Material(name: "Rock Heart", rating: 6),
-            Material(name: "Harden Soul", rating: 6),
-            Material(name: "Double Chambered Heart", rating: 6),
-            Material(name: "Oversized Tendon", rating: 6)
-        ], damageBoost: 50, specialPrompt: "You ... There's no word to describe what just happened", specialDamage: 1000, specialCost: 50)
-    ]
+    let materialsName: [String]
+    let items: [Item]
+    let enemyDrop: [String:[String]]
+    
+    init() {
+        self.input = nil
+        self.materialsName = ["Rock Heart", "Harden Soul", "Double Chambered Heart", "Oversized Tendon"]
+        self.items = [
+            Item(name: "Excalibur", recipe: [
+                Material(name: "Rock Heart", rating: 4),
+                Material(name: "Harden Soul", rating: 3),
+                Material(name: "Oversized Tendon", rating: 2)
+            ], damageBoost: 20, specialPrompt: "You split the sky alongside the world!", specialDamage: 85, specialCost: 20),
+            Item(name: "Gáe Bolg", recipe: [
+                Material(name: "Double Chambered Heart", rating: 4),
+                Material(name: "Oversized Tendon", rating: 3),
+                Material(name: "Rock Heart", rating: 2)
+            ], damageBoost: 30, specialPrompt: "You have pierced to the core of the world!", specialDamage: 75, specialCost: 30),
+            Item(name: "Ea", recipe: [
+                Material(name: "Rock Heart", rating: 3),
+                Material(name: "Harden Soul", rating: 3),
+                Material(name: "Double Chambered Heart", rating: 3),
+                Material(name: "Oversized Tendon", rating: 3)
+            ], damageBoost: 50, specialPrompt: "You ... There's no word to describe what just happened", specialDamage: 1000, specialCost: 50)
+        ]
+        self.enemyDrop = [
+            "Golem": Array(self.materialsName[0...2]),
+            "Troll": Array(self.materialsName[1...3])
+        ]
+    }
     
     func main() {
         repeat {
@@ -69,6 +80,7 @@ class Main {
             [C]heck your health and stats
             [H]eal your wounds with potion
             [E]quip or craft items
+            [V]isit the merchant
 
             ...or choose where you want to go
 
@@ -88,6 +100,8 @@ class Main {
                 healWound(user: user)
             case "e":
                 item(user: user)
+            case "v":
+                shop(user: user)
             case "f":
                 encounter(user: user, intro: """
                 
@@ -198,7 +212,12 @@ class Main {
         var enemies: [Enemy] = []
         
         for _ in 1...enemyQuantity {
-            enemies.append(Enemy(name: enemyName, damage: Int.random(in: 3...5), hp: Int.random(in: 300...500)))
+            enemies.append(
+                Enemy(name: enemyName,
+                      damage: Int.random(in: 3...5),
+                      hp: Int.random(in: 100...200),
+                      drops: enemyDrop[enemyName]!)
+            )
         }
         
         print(intro)
@@ -228,7 +247,7 @@ class Main {
 
         [4] Use Potion to heal wound.
         [5] Use Elixir to fill mana.
-        [6] Scan enemy's vital
+        [6] Scan enemy's vital [See enemy's HP]
         [7] Flee from battle.
 
         Your choice?
@@ -325,10 +344,13 @@ class Main {
             print("""
 
             Choose you action:
-            [1] Equip Item. Item needs to be equipped to have effects
-            [2] Combine Materials. Add the rating of a material.
-            [3] Craft Item
-            [0] Exit
+            [1] Equip Item. Item needs to be equipped to have effects.
+            [2] Combine Materials. Choose a base material and materials to add the rating of the base.
+                (Base material's rating will be added with the materials to be combined's rating.
+                 Be careful to only choose materials with same name as the base.
+                 Materials with a different name from the base will instead decrease the base's rating [minimum 1])
+            [3] Craft Items. Items can only be crafted with certain material above certain rating.
+            [E]xit
 
             Your choice?
             """, terminator: " ")
@@ -345,7 +367,7 @@ class Main {
                     if (input?.lowercased() == "e") {
                         break
                     }
-                    var option = Int(input ?? "-1") ?? -1
+                    let option = Int(input ?? "-1") ?? -1
                     if (option >= 0 && option < user.items.count) {
                         if (user.activeItem != nil) {
                             user.dequip()
@@ -368,7 +390,7 @@ class Main {
                         if (input?.lowercased() == "e") {
                             break outerLoop
                         }
-                        var option = Int(input ?? "-1") ?? -1
+                        let option = Int(input ?? "-1") ?? -1
                         if (option >= 0 && option < user.materials.count) {
                             base = user.useMaterial(index: option)
                             break
@@ -385,9 +407,9 @@ class Main {
                             user.materials.append(base)
                             break
                         }
-                        var option = Int(input ?? "-1") ?? -1
+                        let option = Int(input ?? "-1") ?? -1
                         if (option >= 0 && option < user.materials.count) {
-                            user.materials.append(base.combine(material: user.useMaterial(index: option)))
+                            base = base.combine(material: user.useMaterial(index: option))
                         }
                     } while (true)
                 } while (true)
@@ -396,36 +418,133 @@ class Main {
                 repeat {
                     print("\nCraftable Items:")
                     for (index, item) in items.enumerated() {
-                        print("[\(index)] Name: \(item.name) | Damage Boost: +\(item.damageBoost) | Special Damage: \(item.specialDamage) | Special Cost: \(item.specialCost)MP \nRecipe:", terminator: " ")
+                        print("\n[\(index)] Name: \(item.name) | Damage Boost: +\(item.damageBoost) | Special Damage: \(item.specialDamage) | Special Cost: \(item.specialCost)MP \nRecipe:", terminator: " ")
                         for recipe in item.recipe {
-                            print("\(recipe.name) \(recipe.rating)+", terminator: " | ")
+                            print("\(recipe.name) with \(recipe.rating)+ rating", terminator: " | ")
                         }
                     }
-                    print("\nYour Materials:")
-                    for (index, material) in user.materials.enumerated() {
-                        print("[\(index)] Name: \(material.name) | Rating: \(material.rating)")
+                    print("\n\nYour Materials:")
+                    for material in user.materials {
+                        print("- Name: \(material.name) | Rating: \(material.rating)")
                     }
                     print("\nPress [E] at anytime to Exit.\nWhich item do you want to craft?", terminator: " ")
                     input = readLine()
                     if (input?.lowercased() == "e") {
                         break
                     }
-                    var option = Int(input ?? "-1") ?? -1
+                    let option = Int(input ?? "-1") ?? -1
                     if (option >= 0 && option < items.count) {
                         if (user.craft(item: items[option])) {
-                            print("You have crafted \(items[option])!!!")
+                            print("\nYou have crafted \(items[option].name)!!!")
                         }
                         else {
-                            print("You cannot craft that!")
+                            print("\nYou cannot craft that!")
                         }
                     }
                 } while (true)
             }
-            else if (input == "0") {
+            else if (input == "e") {
                 break
             }
             
         } while (true)
+    }
+    
+    func shop(user: User) {
+        
+        let merchant = Merchant(potionConversion: 3, elixirConversion: 2, materialForPotion: Array(materialsName[0...2]), materialForElixir: Array(materialsName[1...3]))
+        var input: String?
+        print("\n\"Got somethin' that might interest ya'!\"")
+        repeat {
+            print("""
+
+            Choose you action:
+            [1] Trade Material for Potions. The number of potion you get will be determined by the material's rating.
+            [2] Trade Material for Elixirs. The number of elixir you get will be determined by the material's rating.
+            [3] Attack the merchant.
+            [E]xit
+
+            Your choice?
+            """, terminator: " ")
+            input = readLine()
+            if (input?.lowercased() == "e") {
+                break
+            }
+            else if (input == "1") {
+                repeat {
+                    print("\n\nYour Materials:")
+                    for (index, material) in user.materials.enumerated() {
+                        print("[\(index)] Name: \(material.name) | Rating: \(material.rating)")
+                    }
+                    print("""
+                    
+                    Your Potions: \(user.potion)
+
+                    List of Valid Item to Trade: \(merchant.materialForPotion)
+                    Rating to Potion Convertion Rate: \(merchant.potionConversion)
+
+                    Press [E] at anytime to Exit.
+                    Which material do you want to trade for potions?
+                    """, terminator: " ")
+                    input = readLine()
+                    if (input?.lowercased() == "e") {
+                        break
+                    }
+                    let option = Int(input ?? "-1") ?? -1
+                    if (option >= 0 && option < user.materials.count) {
+                        let potion = merchant.tradeForPotion(index: option, user: user)
+                        if (potion > 0) {
+                            print("\nYou get \(potion) potions!")
+                        }
+                        else {
+                            print("\nDeal invalid!")
+                        }
+                    }
+                } while (true)
+            }
+            else if (input == "2") {
+                repeat {
+                    print("\n\nYour Materials:")
+                    for (index, material) in user.materials.enumerated() {
+                        print("[\(index)] Name: \(material.name) | Rating: \(material.rating)")
+                    }
+                    print("""
+                    
+                    Your Elixir: \(user.elixir)
+
+                    List of Valid Item to Trade: \(merchant.materialForElixir)
+                    Rating to Elixir Convertion Rate: \(merchant.elixirConversion)
+
+                    Press [E] at anytime to Exit.
+                    Which material do you want to trade for elixirs?
+                    """, terminator: " ")
+                    input = readLine()
+                    if (input?.lowercased() == "e") {
+                        break
+                    }
+                    let option = Int(input ?? "-1") ?? -1
+                    if (option >= 0 && option < user.materials.count) {
+                        let elixir = merchant.tradeForElixir(index: option, user: user)
+                        if (elixir > 0) {
+                            print("\nYou get \(elixir) elixirs!")
+                        }
+                        else {
+                            print("\nDeal invalid!")
+                        }
+                    }
+                } while (true)
+            }
+            else if (input == "3") {
+                print("\n\"...\"")
+                let damage = merchant.attack(user)
+                print("The merchant attacks in retaliation and deal \(damage)pt of damage!")
+            }
+            
+            if (user.hp <= 0) {
+                print("\nYou Died.\n")
+            }
+            
+        } while (user.hp > 0)
     }
 
     func flee() {

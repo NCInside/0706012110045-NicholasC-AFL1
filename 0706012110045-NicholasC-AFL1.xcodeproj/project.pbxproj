@@ -13,6 +13,7 @@
 		041D707229DDEBA8009B4329 /* Attack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 041D707129DDEBA8009B4329 /* Attack.swift */; };
 		0426C88629D5C112007C707A /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0426C88529D5C112007C707A /* User.swift */; };
 		0426C88829D5C14B007C707A /* Enemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0426C88729D5C14B007C707A /* Enemy.swift */; };
+		0480071729DEEF1C00D7DA07 /* Merchant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0480071629DEEF1C00D7DA07 /* Merchant.swift */; };
 		04DADB1B29B1A02400E92B67 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DADB1A29B1A02400E92B67 /* main.swift */; };
 /* End PBXBuildFile section */
 
@@ -35,6 +36,7 @@
 		041D707129DDEBA8009B4329 /* Attack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attack.swift; sourceTree = "<group>"; };
 		0426C88529D5C112007C707A /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		0426C88729D5C14B007C707A /* Enemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enemy.swift; sourceTree = "<group>"; };
+		0480071629DEEF1C00D7DA07 /* Merchant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Merchant.swift; sourceTree = "<group>"; };
 		04DADB1729B1A02400E92B67 /* 0706012110045-NicholasC-AFL1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "0706012110045-NicholasC-AFL1"; sourceTree = BUILT_PRODUCTS_DIR; };
 		04DADB1A29B1A02400E92B67 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -73,6 +75,7 @@
 				041D349429DBBEA30088B7D1 /* Character.swift */,
 				0426C88529D5C112007C707A /* User.swift */,
 				0426C88729D5C14B007C707A /* Enemy.swift */,
+				0480071629DEEF1C00D7DA07 /* Merchant.swift */,
 				041D706F29DDD232009B4329 /* Material.swift */,
 				041D706D29DDCFF9009B4329 /* Item.swift */,
 				041D707129DDEBA8009B4329 /* Attack.swift */,
@@ -141,6 +144,7 @@
 				041D706E29DDCFF9009B4329 /* Item.swift in Sources */,
 				0426C88629D5C112007C707A /* User.swift in Sources */,
 				041D349529DBBEA30088B7D1 /* Character.swift in Sources */,
+				0480071729DEEF1C00D7DA07 /* Merchant.swift in Sources */,
 				041D707229DDEBA8009B4329 /* Attack.swift in Sources */,
 				04DADB1B29B1A02400E92B67 /* main.swift in Sources */,
 				041D707029DDD232009B4329 /* Material.swift in Sources */,

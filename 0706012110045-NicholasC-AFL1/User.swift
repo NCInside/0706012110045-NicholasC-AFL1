@@ -89,15 +89,19 @@ class User: Character, Attack {
     func craft(item: Item) -> Bool {
         var matching: [Int] = []
         for recipe in item.recipe {
-            for ingredient in materials {
+            for (index, ingredient) in materials.enumerated() {
                 if (Material.match(recipe: recipe, ingredient: ingredient)) {
-                    matching.append(1)
+                    matching.append(index)
                     break
                 }
             }
         }
         if matching.count == item.recipe.count {
             items.append(item)
+            matching.sort(by: >)
+            for i in matching {
+                _ = useMaterial(index: i)
+            }
             return true
         }
         return false

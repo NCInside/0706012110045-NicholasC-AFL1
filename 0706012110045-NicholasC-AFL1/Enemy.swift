@@ -11,11 +11,15 @@ class Enemy: Character, Attack {
     typealias AttackTarget = User
     
     var scanned: Bool
-    var drops: [Material]
+    var drops: [Material] = []
     
-    init(name: String, damage: Int, hp: Int, drops: Material...) {
+    init(name: String, damage: Int, hp: Int, drops: [String]) {
         self.scanned = false
-        self.drops = drops
+        for drop in drops {
+            for i in 1...3 {
+                self.drops.append(Material(name: drop, rating: i))
+            }
+        }
         super.init(name: name, damage: damage, hp: hp)
     }
     
