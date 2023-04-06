@@ -86,10 +86,10 @@ class User: Character, Attack {
         return (true, activeItem!.specialPrompt)
     }
     
-    func craft(item: Item, ingredients: Material...) {
+    func craft(item: Item) -> Bool {
         var matching: [Int] = []
         for recipe in item.recipe {
-            for ingredient in ingredients {
+            for ingredient in materials {
                 if (Material.match(recipe: recipe, ingredient: ingredient)) {
                     matching.append(1)
                     break
@@ -98,11 +98,17 @@ class User: Character, Attack {
         }
         if matching.count == item.recipe.count {
             items.append(item)
+            return true
         }
+        return false
     }
     
-    func useMaterial(index: Int) {
-        materials.remove(at: index)
+    func grabLoot(loot: Material) {
+        materials.append(loot)
+    }
+    
+    func useMaterial(index: Int) -> Material {
+        return materials.remove(at: index)
     }
     
     func equip(item: Item) {

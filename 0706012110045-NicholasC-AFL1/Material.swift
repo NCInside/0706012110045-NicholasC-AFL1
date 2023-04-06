@@ -12,15 +12,13 @@ struct Material: Equatable {
     let name: String
     let rating: Int
     
-    func combine(materials: Material...) -> Material {
+    func combine(material: Material) -> Material {
         var totalRating = 0
-        for material in materials {
-            if material.name != name {
-                totalRating -= material.rating
-            }
-            else {
-                totalRating += material.rating
-            }
+        if material.name != name {
+            totalRating -= material.rating
+        }
+        else {
+            totalRating += material.rating
         }
         return Material(name: name, rating: (totalRating <= -rating) ? 1 : (rating + totalRating) )
     }
