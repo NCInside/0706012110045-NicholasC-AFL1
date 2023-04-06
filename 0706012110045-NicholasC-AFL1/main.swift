@@ -150,7 +150,7 @@ class Main {
         - Shield. Use 10pt of MP. Block enemy's attack in 1 turn.
         \(user.activeItem != nil ? "- \(user.activeItem!.name) Special. Use \(user.activeItem!.specialCost)pt of MP. Deal \(user.activeItem!.specialDamage)pt of damage." : "")
 
-        Items:
+        Pots:
         - Potion x\(user.potion). Heal \(user.potionHeal)pt of your HP.
         - Elixir x\(user.elixir). Add \(user.elixirHeal)pt of your MP.
 
